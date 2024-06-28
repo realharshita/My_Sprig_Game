@@ -160,10 +160,10 @@ p.....
 
 setMap(levels[level])
 
-
+const allBoxTypes = [box, entangled_box_red_a, entangled_box_red_b]; 
 setPushables({
-  [ player ]: [box]
-})
+  [player]: allBoxTypes
+});
 
 
 // inputs for player movement control
@@ -183,21 +183,37 @@ onInput("d", () => {
 
 
 afterInput(() => {
-  const targetNumber = tilesWith(target).length;
-  const boxCovered = tilesWith(target, box).length;
-  const entangledRedACovered = tilesWith(target, entangled_box_red_a).length;
-  const entangledRedBCovered = tilesWith(target, entangled_box_red_b).length;
-  const numberCovered = boxCovered + entangledRedACovered + entangledRedBCovered;
-  if (numberCovered === targetNumber) {
-  addText("level completed", { y: 4, color: color`5` });
+  const allBoxTypes = [box, entangled_box_red_a, entangled_box_red_b];
+  const targetNumber = allBoxTypes.reduce((acc, boxType) => {
+    return acc + tilesWith(boxType).length;
+  }, 0);
   
-  const currentLevel = levels[level];
+  const playerSprite = getFirst(player);
+  const playerX = playerSprite.x;
+  const playerY = playerSprite.y;
   
-  if (currentLevel !== undefined) {
-    setMap(currentLevel);
-    level = level + 1;  // Increment the level after setting the new level
-  } else {
-    addText("you win!", { y: 4, color: color`3` });
+  allBoxTypes.forEach(boxType => {
+    const boxSprites = tilesWith(boxType);
+    boxSprites.forEach(boxSprite => {
+      if (boxSprite.x === playerX && boxSprite.y === playerY) {
+        clearTile(boxSprite.x, boxSprite.y); // Remove the box sprite by clearing the tile
+      }
+    });
+  });
+
+  // Check if all boxes are removed
+  const remainingBoxes = allBoxTypes.reduce((acc, boxType) => {
+    return acc + tilesWith(boxType).length;
+  }, 0);
+  
+  if (remainingBoxes === 0) {aas
+    addText("level completed", { y: 4, color: color`5` });
+  
+    if (level < levels.length - 1) {
+      level++;  // Increment the level after setting the new level
+      setMap(levels[level]);
+    } else {
+      addText("you win!", { y: 4, color: color`3` });
+    }
   }
-}
 });
