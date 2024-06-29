@@ -14,11 +14,10 @@ const player = "p"
 const box = "b"
 const entangled_box_red_a = "e"
 const entangled_box_red_b = "f"
-const target = "t" 
+const black_hole = "t" 
 const wall = "w"
 
 setLegend(
-  
   [ player, bitmap`
 ................
 ................
@@ -50,8 +49,6 @@ setLegend(
 .....000000.....
 ................
 ................
-................
-................
 ................` ],
   [ entangled_box_red_a, bitmap`
 ................
@@ -65,8 +62,6 @@ setLegend(
 .....303000.....
 .....030000.....
 .....300000.....
-................
-................
 ................
 ................
 ................` ],
@@ -84,10 +79,8 @@ setLegend(
 .....303030.....
 ................
 ................
-................
-................
 ................` ],
-  [ target, bitmap`
+  [ black_hole, bitmap`
 ....00000000000.
 ...000.....00000
 .0000LLLLL..0000
@@ -118,14 +111,10 @@ setLegend(
 .....3C3C3C3....
 ................
 ................
-................
-................
 ................` ]
-
-
 )
 
-setSolids([ player, box, wall,entangled_box_red_b,entangled_box_red_a ]); 
+setSolids([ player, box, wall, entangled_box_red_b, entangled_box_red_a ]); 
 let level = 0
 const levels = [
   map`
@@ -154,9 +143,7 @@ p.....
 ..b...
 ..t...
 ..w...`
-  
 ]
-
 
 setMap(levels[level])
 
@@ -165,22 +152,45 @@ setPushables({
   [player]: allBoxTypes
 });
 
+function moveEntangledBoxes(playerSprite, dx, dy) {
+  const entangledBoxA = getFirst(entangled_box_red_a);
+  const entangledBoxB = getFirst(entangled_box_red_b);
+  
+  if (entangledBoxA && entangledBoxB) {
+    const newPosX = playerSprite.x - dx;
+    const newPosY = playerSprite.y - dy;
+  
+    entangledBoxA.x = newPosX + dx;
+    entangledBoxA.y = newPosY + dy;
+  
+    entangledBoxB.x = newPosX - dx;
+    entangledBoxB.y = newPosY - dy;
+  }
+}
 
-// inputs for player movement control
 onInput("s", () => {
-  getFirst(player).y += 1; // positive y is downwards
+  const playerSprite = getFirst(player);
+  playerSprite.y += 1;
+  moveEntangledBoxes(playerSprite, 0, -1);
 });
-onInput("w", () => {
-  getFirst(player).y -= 1;
-});
-onInput("a", () => {
-  getFirst(player).x -= 1;
-});
-onInput("d", () => {
-  getFirst(player).x += 1;
-});
-// inputs for player movement control
 
+onInput("w", () => {
+  const playerSprite = getFirst(player);
+  playerSprite.y -= 1;
+  moveEntangledBoxes(playerSprite, 0, 1);
+});
+
+onInput("a", () => {
+  const playerSprite = getFirst(player);
+  playerSprite.x -= 1;
+  moveEntangledBoxes(playerSprite, 1, 0);
+});
+
+onInput("d", () => {
+  const playerSprite = getFirst(player);
+  playerSprite.x += 1;
+  moveEntangledBoxes(playerSprite, -1, 0);
+});
 
 let gameCompleted = false;
 
@@ -201,10 +211,10 @@ afterInput(() => {
 
     allBoxTypes.forEach(type => {
       const boxSprites = getAll(type);
-      const targetTileSprites = getTile(getFirst(target).x, getFirst(target).y);
+      const black_holeTileSprites = getTile(getFirst(black_hole).x, getFirst(black_hole).y);
       
       boxSprites.forEach(boxSprite => {
-        if (targetTileSprites.includes(boxSprite)) {
+        if (black_holeTileSprites.includes(boxSprite)) {
           boxSprite.remove(); 
         }
       });
