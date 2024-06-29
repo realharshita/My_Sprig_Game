@@ -22,14 +22,14 @@ setLegend(
 ................
 ................
 ................
-.....L....L.....
-.....LL..LL.....
-.....000000.....
-...L.0....0.L...
-....L07..70L....
-.....0.LL.0.....
-.....0.33.0.....
-.....000000.....
+HH...LH..HL.....
+HHH..LL..LL.....
+.HHH.000000HHH..
+..HHH0....0HCH..
+...HL07..70HHH..
+.....0.LL.0HCH..
+.....0.33.0HCH..
+.....000000HHH..
 .....LL..LL.....
 .....L....L.....
 ................
@@ -37,48 +37,54 @@ setLegend(
 ................` ],
   [ box, bitmap`
 ................
-................
-................
-................
-................
-.....000000.....
-.....000000.....
-.....000000.....
-.....000000.....
-.....000000.....
-.....000000.....
-................
-................
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
+.00000000000000.
 ................` ],
   [ entangled_box_red_a, bitmap`
 ................
-................
-................
-................
-................
-.....030303.....
-.....303030.....
-.....030300.....
-.....303000.....
-.....030000.....
-.....300000.....
-................
-................
+.03030303030303.
+.30303030303030.
+.03030303030300.
+.30303030303000.
+.03030303030000.
+.30303030300000.
+.03030303000000.
+.30303030000000.
+.03030300000000.
+.30303000000000.
+.03030000000000.
+.30300000000000.
+.03000000000000.
+.30000000000000.
 ................` ],
   [ entangled_box_red_b, bitmap`
 ................
-................
-................
-................
-................
-.....000003.....
-.....000030.....
-.....000303.....
-.....003030.....
-.....030303.....
-.....303030.....
-................
-................
+.00000000000003.
+.00000000000030.
+.00000000000303.
+.00000000003030.
+.00000000030303.
+.00000000303030.
+.00000003030303.
+.00000030303030.
+.00000303030303.
+.00003030303030.
+.00030303030303.
+.00303030303030.
+.03030303030303.
+.30303030303030.
 ................` ],
   [ black_hole, bitmap`
 ....00000000000.
@@ -155,42 +161,98 @@ setPushables({
 function moveEntangledBoxes(playerSprite, dx, dy) {
   const entangledBoxA = getFirst(entangled_box_red_a);
   const entangledBoxB = getFirst(entangled_box_red_b);
-  
+
   if (entangledBoxA && entangledBoxB) {
-    const newPosX = playerSprite.x - dx;
-    const newPosY = playerSprite.y - dy;
-  
-    entangledBoxA.x = newPosX + dx;
-    entangledBoxA.y = newPosY + dy;
-  
-    entangledBoxB.x = newPosX - dx;
-    entangledBoxB.y = newPosY - dy;
+    const newPosX = playerSprite.x + dx;
+    const newPosY = playerSprite.y + dy;
+
+    const playerOffsetX = dx - (entangledBoxA.x - playerSprite.x);
+    const playerOffsetY = dy - (entangledBoxA.y - playerSprite.y);
+
+    entangledBoxA.x += playerOffsetX;
+    entangledBoxA.y += playerOffsetY;
+
+    entangledBoxB.x += playerOffsetX;
+    entangledBoxB.y += playerOffsetY;
   }
 }
 
+
+
+// Function to check if the player is in the black hole area
+function isPlayerInBlackHole(playerX, playerY) {
+  const blackHoleX = getFirst(black_hole).x;
+  const blackHoleY = getFirst(black_hole).y;
+
+  return playerX === blackHoleX && playerY === blackHoleY;
+}
+
+// Inputs for player movement control
 onInput("s", () => {
   const playerSprite = getFirst(player);
+  const playerX = playerSprite.x;
+  const playerY = playerSprite.y;
+
   playerSprite.y += 1;
-  moveEntangledBoxes(playerSprite, 0, -1);
+  moveEntangledBoxes(playerSprite, 0, 1);
+
+  if (isPlayerInBlackHole(playerX, playerY)) {
+    playerSprite.remove();
+    clearText();
+    addText("Game Over", { x: (width() - 10) / 2, y: height() / 2, color: color`c` });
+    gameCompleted = true;
+  }
 });
 
 onInput("w", () => {
   const playerSprite = getFirst(player);
+  const playerX = playerSprite.x;
+  const playerY = playerSprite.y;
+
   playerSprite.y -= 1;
-  moveEntangledBoxes(playerSprite, 0, 1);
+  moveEntangledBoxes(playerSprite, 0, -1);
+
+  if (isPlayerInBlackHole(playerX, playerY)) {
+    playerSprite.remove();
+    clearText();
+    addText("Game Over", { x: (width() - 10) / 2, y: height() / 2, color: color`c` });
+    gameCompleted = true;
+  }
 });
 
 onInput("a", () => {
   const playerSprite = getFirst(player);
+  const playerX = playerSprite.x;
+  const playerY = playerSprite.y;
+
   playerSprite.x -= 1;
-  moveEntangledBoxes(playerSprite, 1, 0);
+  moveEntangledBoxes(playerSprite, -1, 0);
+
+  if (isPlayerInBlackHole(playerX, playerY)) {
+    playerSprite.remove();
+    clearText();
+    addText("Game Over", { x: (width() - 10) / 2, y: height() / 2, color: color`c` });
+    gameCompleted = true;
+  }
 });
 
 onInput("d", () => {
   const playerSprite = getFirst(player);
+  const playerX = playerSprite.x;
+  const playerY = playerSprite.y;
+
   playerSprite.x += 1;
-  moveEntangledBoxes(playerSprite, -1, 0);
+  moveEntangledBoxes(playerSprite, 1, 0);
+
+  if (isPlayerInBlackHole(playerX, playerY)) {
+    playerSprite.remove();
+    clearText();
+    addText("Game Over", { x: (width() - 10) / 2, y: height() / 2, color: color`c` });
+    gameCompleted = true;
+  }
 });
+
+
 
 let gameCompleted = false;
 
