@@ -88,22 +88,22 @@ setLegend(
 ................
 ................` ],
   [ target, bitmap`
-................
-................
-................
-................
-................
-......0..0......
-.....046740.....
-......7..6......
-......6..7......
-.....047640.....
-......0..0......
-................
-................
-................
-................
-................` ],
+....00000000000.
+...000.....00000
+.0000LLLLL..0000
+000..L...LLL..00
+00.LLL.11..LLL.0
+00.L..111111.L.0
+0.LL.1222.11.L.0
+0.L.112.2..1.L.0
+0.L.1.2.22.1.L.0
+0.L.11222211.L.0
+0.LL.11..11.LL.0
+00.LL.1111.LL.00
+000.LL.....L..00
+.00..LLLLLLL.00.
+..000000...0000.
+...0000000000...` ],
   [ wall, bitmap`
 ................
 ................
@@ -153,7 +153,7 @@ p.....
 p.....
 ..b...
 ..t...
-..w...`,
+..w...`
   
 ]
 
@@ -182,38 +182,37 @@ onInput("d", () => {
 // inputs for player movement control
 
 
-afterInput(() => {
-  const allBoxTypes = [box, entangled_box_red_a, entangled_box_red_b];
-  const targetNumber = allBoxTypes.reduce((acc, boxType) => {
-    return acc + tilesWith(boxType).length;
-  }, 0);
-  
-  const playerSprite = getFirst(player);
-  const playerX = playerSprite.x;
-  const playerY = playerSprite.y;
-  
-  allBoxTypes.forEach(boxType => {
-    const boxSprites = tilesWith(boxType);
-    boxSprites.forEach(boxSprite => {
-      if (boxSprite.x === playerX && boxSprite.y === playerY) {
-        clearTile(boxSprite.x, boxSprite.y); // Remove the box sprite by clearing the tile
-      }
-    });
-  });
+let gameCompleted = false;
 
-  // Check if all boxes are removed
-  const remainingBoxes = allBoxTypes.reduce((acc, boxType) => {
-    return acc + tilesWith(boxType).length;
-  }, 0);
-  
-  if (remainingBoxes === 0) {aas
-    addText("level completed", { y: 4, color: color`5` });
-  
-    if (level < levels.length - 1) {
-      level++;  // Increment the level after setting the new level
-      setMap(levels[level]);
-    } else {
-      addText("you win!", { y: 4, color: color`3` });
+afterInput(() => {
+  if (!gameCompleted) {
+    const remainingBoxTypes = allBoxTypes.filter(type => getAll(type).length > 0);
+
+    if (remainingBoxTypes.length === 0) {
+      level++;
+      if (level < levels.length) {
+        setMap(levels[level]);
+      } else {
+        clearText(); 
+        addText("Game End", { x: (width() - 8) / 2, y: height() / 2, color: color`c` }); 
+        gameCompleted = true; 
+      }
+    }
+
+    allBoxTypes.forEach(type => {
+      const boxSprites = getAll(type);
+      const targetTileSprites = getTile(getFirst(target).x, getFirst(target).y);
+      
+      boxSprites.forEach(boxSprite => {
+        if (targetTileSprites.includes(boxSprite)) {
+          boxSprite.remove(); 
+        }
+      });
+    });
+
+    if (!gameCompleted) {
+      clearText(); 
+      addText(`Level: ${level + 1}`, { x: width() - 2, y: 2, color: color`9` }); 
     }
   }
 });
