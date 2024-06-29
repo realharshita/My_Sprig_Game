@@ -160,6 +160,38 @@ w..p.b....w
 w..w...e..w
 w....w.f..w
 w.........w
+wwwwwwwwwww`,
+  map`
+wwwwwwwwwww
+w...e.....w
+w..p..b..w
+w..w..t...w
+w....w..f.w
+w.........w
+wwwwwwwwwww`,
+  map`
+wwwwwwwwwww
+w..t....e.w
+w..p..b...w
+w..w....f.w
+w....w....w
+w.........w
+wwwwwwwwwww`,
+  map`
+wwwwwwwwwww
+w....t....w
+w..p..b..w
+w..w..e...w
+w....w.f..w
+w.........w
+wwwwwwwwwww`,
+  map`
+wwwwwwwwwww
+w....t....w
+w..p..b...w
+w..w..e.f.w
+w....w....w
+w.........w
 wwwwwwwwwww`
 ];
 
