@@ -37,6 +37,9 @@ The player must navigate through different levels to escape the simulation.
 2. Open the game in the Sprig editor.
 3. Run the game to start playing "Quantum Escape."
 
+or head over to:
+https://sprig.hackclub.com/~/XPYvAWITqMxxxMvHp57j
+
 ## Authors
 
 Harshita
